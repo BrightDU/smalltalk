@@ -27,6 +27,7 @@ const isEmail = (email) => {
     if (isEmpty(data.handle)) errors.handle = 'Must not be empty';
   
     //checks for specific errors
+    
     return {
       errors,
       valid: Object.keys(errors).length === 0 ? true : false
