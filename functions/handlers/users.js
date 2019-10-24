@@ -1,3 +1,5 @@
+import { filterUserDetails } from '../util/validators';
+
 const { admin, db } = require('../util/admin');
 
 const config = require('../util/config');
@@ -8,7 +10,7 @@ firebase.initializeApp(config);
 const {
   validateSignupData,
   validateLoginData,
-  reduceUserDetails
+  filterUserDetails
 } = require('../util/validators');
 
 // Sign users up
@@ -24,6 +26,7 @@ exports.signup = (req, res) => {
 
   if (!valid) return res.status(400).json(errors);
 
+  //default empty image for all new users
   const profileIcon = 'profile-icon-empty.png';
 
   let token, userId;
@@ -99,7 +102,24 @@ exports.login = (req, res) => {
     });
 };
 
-// Upload a profile image for user
+// Adds(appends) a user details to the users document
+exports.addUserDetails = (req, res) => {
+  let userDetails = filterUserDetails(req.body);
+
+  db.doc(`/users/${req.user.handle}`)
+    .update(userDetails)
+    .then(() => {
+      return res.json({ message: 'Details added successfully' });
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).json({ error: err.code });
+    });
+};
+
+
+
+// Upload a profile image for user and replcaes it's default image
 exports.uploadImage = (req, res) => {
     const BusBoy = require('busboy');
     const path = require('path');
